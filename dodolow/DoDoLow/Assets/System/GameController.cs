@@ -31,6 +31,7 @@ public class GameController : MonoBehaviour
             slots[i].Open();
         }
         await Task.Delay(5000);
+        mainMenuButton.SetActive(true);
         Timer.instance.StartTimer();
         for(int i = 0; i < slots.Count; i++){
             slots[i].Init();
@@ -62,7 +63,6 @@ public class GameController : MonoBehaviour
     }
     void EndGame(){
         restartButton.SetActive(true);
-        mainMenuButton.SetActive(true);
         Timer.instance.StopTimer();
     }
     List<T> Shuffle<T>(List<T> list){

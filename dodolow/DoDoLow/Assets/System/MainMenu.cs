@@ -5,7 +5,12 @@ using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour
 {
+    public static MainMenu instance;
     [SerializeField] GameObject mainMenu;
+    private void Awake() {
+        instance = this;
+    }
+    public Toggle cheatMode;
     public void OnStartGameButtonPressed(){
         mainMenu.SetActive(false);
         GameController.instance.InitializeSlots();
@@ -18,5 +23,6 @@ public class MainMenu : MonoBehaviour
     }
     public void OnMainMenuButtonPressed(){
         mainMenu.SetActive(true);
+        Timer.instance.StopTimer();
     }
 }

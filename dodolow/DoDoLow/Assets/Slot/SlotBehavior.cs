@@ -27,7 +27,8 @@ public class SlotBehavior : MonoBehaviour
         opened = true;
         canBeClicked = false;
         image.sprite = Assets.Instance.GetCardImage(slotId);
-        cheat.text = slotId.ToString();
+        if(MainMenu.instance.cheatMode.isOn) cheat.text = slotId.ToString();
+        else cheat.text = "";
     }
     public void Init(){
         opened = false;
