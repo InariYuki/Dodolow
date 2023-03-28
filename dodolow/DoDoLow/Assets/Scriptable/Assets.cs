@@ -23,9 +23,6 @@ public class Assets : ScriptableObject
             IdCardDict[cards[i].id] = cards[i];
         }
     }
-    public Sprite GetCardImage(byte id){
-        return IdCardDict[id].image;
-    }
 }
 [System.Serializable]
 public class Card{

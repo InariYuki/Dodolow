@@ -19,25 +19,25 @@ public class SlotBehavior : MonoBehaviour
         cheat.raycastTarget = false;
     }
     public void OnSlotClicked(){
-        if(canBeClicked == false) return;
+        if(!canBeClicked || !GameController.instance.canClick) return;
         Open();
         GameController.instance.SlotClicked(this);
     }
     public void Open(){
+        cheat.text = "";
         opened = true;
         canBeClicked = false;
-        image.sprite = Assets.Instance.GetCardImage(slotId);
-        if(MainMenu.instance.cheatMode.isOn) cheat.text = slotId.ToString();
-        else cheat.text = "";
+        image.sprite = Assets.Instance.IdCardDict[slotId].image;
     }
-    public void Init(){
+    public void Close(){
         opened = false;
         canBeClicked = true;
         image.sprite = Assets.Instance.blankSprite;
+        if(MainMenu.instance.cheatMode.isOn) cheat.text = slotId.ToString();
+        else cheat.text = "";
     }
     public void DisableSlot(){
         canBeClicked = false;
-        image.sprite = null;
         image.sprite = Assets.Instance.disableSprite;
     }
 }

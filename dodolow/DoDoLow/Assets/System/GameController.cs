@@ -10,18 +10,17 @@ public class GameController : MonoBehaviour
     [SerializeField] GameObject restartButton , mainMenuButton;
     [SerializeField] List<SlotBehavior> slots = new List<SlotBehavior>();
     [HideInInspector] public SlotBehavior currentSlot;
-    EventSystem eventSystem;
+    [HideInInspector] public bool canClick = false;
     int openedSlotCount = 0;
     private void Awake() {
         instance = this;
-        eventSystem = EventSystem.current;
     }
     public async void InitializeSlots(){
         Timer.instance.ResetTimer();
         restartButton.SetActive(false);
         mainMenuButton.SetActive(false);
         openedSlotCount = 0;
-        eventSystem.enabled = false;
+        canClick = false;
         slots = Shuffle(slots);
         for(byte i = 0; i < 20 ; i++){
             slots[2 * i].slotId = i;
@@ -34,16 +33,16 @@ public class GameController : MonoBehaviour
         mainMenuButton.SetActive(true);
         Timer.instance.StartTimer();
         for(int i = 0; i < slots.Count; i++){
-            slots[i].Init();
+            slots[i].Close();
         }
-        eventSystem.enabled = true;
+        canClick = true;
     }
     public async void SlotClicked(SlotBehavior slot){
         if(currentSlot == null){
             currentSlot = slot;
         }
         else{
-            eventSystem.enabled = false;
+            canClick = false;
             await Task.Delay(1000);
             if(currentSlot.slotId == slot.slotId){
                 currentSlot.DisableSlot();
@@ -54,10 +53,10 @@ public class GameController : MonoBehaviour
                 }
             }
             else{
-                currentSlot.Init();
-                slot.Init();
+                currentSlot.Close();
+                slot.Close();
             }
-            eventSystem.enabled = true;
+            canClick = true;
             currentSlot = null;
         }
     }
