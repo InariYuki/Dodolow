@@ -40,7 +40,7 @@ public class SlotController
     }
     string CheckCheat(){
         string s;
-        if(controller.IsCheating())s = model.GetSlotId().ToString();
+        if(controller.IsCheating()) s = model.GetSlotId().ToString();
         else s = "";
         return s;
     }
