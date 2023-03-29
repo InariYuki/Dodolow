@@ -16,7 +16,7 @@ public class Assets : ScriptableObject
         }
     }
     [SerializeField] List<Card> cards = new List<Card>();
-    public Dictionary<byte , Card> IdCardDict = new Dictionary<byte, Card>();
+    public Dictionary<int , Card> IdCardDict = new Dictionary<int, Card>();
     public Sprite blankSprite , disableSprite;
     void GenerateIdCardDict(){
         for(int i = 0; i < cards.Count; i++){
