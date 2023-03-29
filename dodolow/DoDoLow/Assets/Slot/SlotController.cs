@@ -13,7 +13,6 @@ public class SlotController
         model = new SlotModel();
         view = controller.GetSlotViewByIndex(index);
         view.Initialize(this);
-        Close();
     }
     public void SetSlotId(int id){
         model.SetSlotId(id);
