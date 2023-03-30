@@ -1,90 +1,73 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Threading.Tasks;
 
-public delegate void WinEvent();
-public delegate void SlotClickedEvent(int index);
-public delegate void DisableSlotEvent(int index);
-public delegate void CloseSlotEvent(int index);
+public delegate void VoidEventIntInt(int index1 , int index2);
 public class Model
 {
-    public event WinEvent WinEvent;
-    public event SlotClickedEvent SlotClickedEvent;
-    public event DisableSlotEvent DisableSlotEvent;
-    public event CloseSlotEvent CloseSlotEvent;
+    public event VoidEvent RandomizeGameCompleteEvent , GameFinishedEvent;
+    public event EventInt SlotClickedEvent;
+    public event VoidEventIntInt MatchEvent , MisMatchEvent;
     private List<SlotModel> slotModels = new List<SlotModel>();
-    private SlotModel currentSlotModel = null;
-    private bool canClick = true;
-    private int slotOpened = 0;
+    private List<int> slotIds = new List<int>();
+    private SlotModel currentSlot;
+    private bool mouseLock = false;
+    private int openedSlotCount = 0;
     public void Initialize(){
-        for(int i = 0; i < 40 ; i++){
-            SlotModel m = new SlotModel();
-            m.Initialize(i);
-            slotModels.Add(m);
+        for(int i = 0; i < 40; i++){
+            SlotModel s = new SlotModel();
+            s.index = i;
+            s.slotId = 0;
+            slotModels.Add(s);
+            if(i % 2 == 0){
+                int index = i / 2;
+                slotIds.Add(index);
+                slotIds.Add(index);
+            }
         }
     }
-    public async void SlotClicked(int slotIndex){
-        if(!canClick) return;
-        if(currentSlotModel == null){
-            if(slotModels[slotIndex].CanBeClicked()){
-                currentSlotModel = slotModels[slotIndex];
-                SlotClickedEvent(slotIndex);
-            }
+    public void RandomizeGame(){
+        openedSlotCount = 0;
+        slotIds = Shuffle(slotIds);
+        for(int i = 0; i < slotModels.Count; i++){
+            slotModels[i].slotId = slotIds[i];
+        }
+        RandomizeGameCompleteEvent();
+    }
+    public void SetSlotClickable(int index , bool state){
+        slotModels[index].canBeClick = state;
+    }
+    public void SlotClicked(int index){
+        if(!slotModels[index].canBeClick || mouseLock) return;
+        slotModels[index].canBeClick = false;
+        SlotClickedEvent(index);
+        if(currentSlot == null){
+            currentSlot = slotModels[index];
         }
         else{
-            if(slotModels[slotIndex].CanBeClicked()){
-                canClick = false;
-                SlotClickedEvent(slotIndex);
-                await Task.Delay(1000);
-                if(currentSlotModel.GetSlotId() == slotModels[slotIndex].GetSlotId()){
-                    currentSlotModel.SetCanBeClicked(false);
-                    slotModels[slotIndex].SetCanBeClicked(false);
-                    DisableSlotEvent(currentSlotModel.GetSlotIndex());
-                    DisableSlotEvent(slotIndex);
-                    slotOpened += 2;
-                    if(slotOpened == slotModels.Count){
-                        canClick = true;
-                        currentSlotModel = null;
-                        WinEvent();
-                        return;
-                    }
+            if(slotModels[index].slotId == currentSlot.slotId){
+                MatchEvent(index , currentSlot.index);
+                openedSlotCount += 2;
+                if(openedSlotCount == slotModels.Count){
+                    GameFinishedEvent();
                 }
-                else{
-                    currentSlotModel.SetCanBeClicked(false);
-                    slotModels[slotIndex].SetCanBeClicked(false);
-                    CloseSlotEvent(currentSlotModel.GetSlotIndex());
-                    CloseSlotEvent(slotIndex);
-                }
-                canClick = true;
-                currentSlotModel = null;
             }
+            else{
+                MisMatchEvent(index , currentSlot.index);
+            }
+            currentSlot = null;
         }
     }
-    public async Task StartGame(){
-        canClick = false;
-        slotOpened = 0;
-        slotModels = Shuffle(slotModels);
-        for(int i = 0; i < 20; i++){
-            slotModels[2 * i].SetSlotId(i);
-            slotModels[2 * i + 1].SetSlotId(i);
-        }
-        for(int i = 0; i < slotModels.Count; i++){
-            slotModels[i].SetCanBeClicked(false);
-        }
-        await Task.Delay(5000);
-        canClick = true;
-        for(int i = 0; i < slotModels.Count; i++){
-            slotModels[i].SetCanBeClicked(true);
-        }
+    public int GetSlotId(int index){
+        return slotModels[index].slotId;
     }
-    public bool MouseLocked(){
-        return !canClick;
+    public int GetSlotSize(){
+        return slotModels.Count;
     }
-    public int GetSlotModelByIndex(int index){
-        return slotModels[index].GetSlotId();
+    public void SetMouseLock(bool state){
+        mouseLock = state;
     }
-    List<T> Shuffle<T>(List<T> list){
+    private List<T> Shuffle<T>(List<T> list){
         int n = list.Count;  
         while (n > 1) {  
             n--;  
@@ -95,4 +78,9 @@ public class Model
         }
         return list;
     }
+}
+class SlotModel{
+    public int index;
+    public int slotId;
+    public bool canBeClick = false;
 }

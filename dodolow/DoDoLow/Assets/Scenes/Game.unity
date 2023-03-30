@@ -205,11 +205,11 @@ MonoBehaviour:
   - {fileID: 424795405}
   - {fileID: 138555281}
   - {fileID: 1906956782}
-  timerView: {fileID: 488150754}
   mainMenu: {fileID: 447249211}
-  cheatToggle: {fileID: 1133426255}
-  menuButton: {fileID: 603441446}
   restartButton: {fileID: 1238542473}
+  mainMenuButton: {fileID: 603441446}
+  cheatBox: {fileID: 1133426255}
+  timerDisplay: {fileID: 488150752}
 --- !u!1 &20908704
 GameObject:
   m_ObjectHideFlags: 0
@@ -3917,7 +3917,6 @@ GameObject:
   - component: {fileID: 488150751}
   - component: {fileID: 488150753}
   - component: {fileID: 488150752}
-  - component: {fileID: 488150754}
   m_Layer: 5
   m_Name: Timer
   m_TagString: Untagged
@@ -4040,18 +4039,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 488150750}
   m_CullTransparentMesh: 0
---- !u!114 &488150754
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 488150750}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f7c35c6d3d535c44b382f49a19b1c1d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &499028034
 GameObject:
   m_ObjectHideFlags: 0

@@ -2,96 +2,73 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
-public delegate void OnStartGameButtonPressed();
-public delegate void OnExitButtonPressed();
-public delegate void OnRestartButtonPressed();
-public delegate void OnMainMenuButtonPressed();
-public delegate void SlotClicked(int slotNum);
-
+public delegate void EventInt(int i);
+public delegate void VoidEvent();
 public class View : MonoBehaviour
 {
+    public event EventInt SlotClickedEvent;
+    public event VoidEvent StartGameEvent , ExitGameEvent , RestartEvent , MainMenuEvent;
     [SerializeField] private List<SlotView> slotViews = new List<SlotView>();
-    [SerializeField] private TimerView timerView;
     [SerializeField] private GameObject mainMenu;
-    [SerializeField] private Toggle cheatToggle;
-    [SerializeField] private GameObject menuButton , restartButton;
-    public event OnStartGameButtonPressed StartGameEvent;
-    public event OnExitButtonPressed ExitGameEvent;
-    public event OnRestartButtonPressed RestartEvent;
-    public event OnMainMenuButtonPressed MainMenuEvent;
-    public event SlotClicked SlotClickedEvent;
-    private void Awake() {
+    [SerializeField] private GameObject restartButton , mainMenuButton;
+    [SerializeField] private Toggle cheatBox;
+    [SerializeField] private TextMeshProUGUI timerDisplay;
+    private void Awake(){
         Controller controller = new Controller();
         controller.Initialize(this);
         for(int i = 0; i < slotViews.Count; i++){
             slotViews[i].Initialize(this , i);
         }
     }
-    public void ShowMainMenu(){
-        mainMenu.SetActive(true);
-    }
-    public void HideMainMenu(){
-        mainMenu.SetActive(false);
-    }
-    public void HideMenuButton(){
-        menuButton.SetActive(false);
-    }
-    public void HideRestartButton(){
-        restartButton.SetActive(false);
-    }
-    public void ShowMenuButton(){
-        menuButton.SetActive(true);
-    }
-    public void ShowRestartButton(){
-        restartButton.SetActive(true);
-    }
-    public List<SlotView> GetAllSlotViews(){
-        return slotViews;
+    public void SlotClicked(int index){
+        SlotClickedEvent(index);
     }
     public void OnStartGameButtonPressed(){
+        mainMenu.SetActive(false);
         StartGameEvent();
     }
     public void OnExitButtonPressed(){
         ExitGameEvent();
     }
-    public void OnRestartButtonPressed(){
-        RestartEvent();
-    }
     public void OnMainMenuButtonPressed(){
         MainMenuEvent();
     }
-    public bool IsCheating(){
-        return cheatToggle.isOn;
+    public void OnRestartButtonPressed(){
+        RestartEvent();
     }
-    public TimerView GetTimerView(){
-        return timerView;
+    public bool CheatBoxChecked(){
+        return cheatBox.isOn;
     }
-    public void SlotClicked(int index){
-        SlotClickedEvent(index);
+    public void ToggleMainMenu(bool state){
+        mainMenu.SetActive(state);
     }
-    public void SetSlotView(SlotViewParameters parameter){
+    public void ToggleManuMenuButton(bool state){
+        mainMenuButton.SetActive(state);
+    }
+    public void ToggleRestartButton(bool state){
+        restartButton.SetActive(state);
+    }
+    public void SetSlotView(int index , int id , int state , bool cheat){
         Sprite sprite;
-        string slotId; 
-        switch(parameter.state){
-            case 0:
-                sprite = Assets.Instance.IdCardDict[parameter.slotId].image;
-                slotId = "";
-                break;
-            case 1:
-                sprite = Assets.Instance.blankSprite;
-                slotId = cheatToggle.isOn ? parameter.slotId.ToString() : "";
-                break;
-            default:
-                sprite = Assets.Instance.disableSprite;
-                slotId = "";
-                break;
+        string slotIdText;
+        if(state == 0){ // open
+            sprite = Assets.Instance.IdCardDict[id].image;
+            slotIdText = "";
         }
-        slotViews[parameter.slotIndex].UpdateDisplay(sprite , slotId);
+        else if(state == 1){ // close
+            sprite = Assets.Instance.blankSprite;
+            if(cheat) slotIdText = id.ToString();
+            else slotIdText = "";
+        }
+        else{ // disable
+            sprite = Assets.Instance.disableSprite;
+            slotIdText = "";
+        }
+        slotViews[index].UpdateDisplay(sprite , slotIdText);
     }
-}
-public class SlotViewParameters{
-    public int slotIndex;
-    public int slotId;
-    public int state; //0 = open , 1 = close , 2 = disabled
+    public void SetTimerTime(string time){
+        timerDisplay.text = time;
+    }
 }
