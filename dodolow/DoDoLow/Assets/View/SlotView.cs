@@ -6,22 +6,24 @@ using TMPro;
 
 public class SlotView : MonoBehaviour
 {
-    Image image;
-    TextMeshProUGUI text;
-    SlotController controller;
-    public void Initialize(SlotController c){
+    private Image image;
+    private TextMeshProUGUI text;
+    private View view;
+    private int index;
+    public void Initialize(View v , int i){
+        view = v;
+        index = i;
         image = GetComponent<Image>();
         GetComponent<Button>().onClick.AddListener(OnSlotClicked);
         text = GetComponentInChildren<TextMeshProUGUI>();
         text.raycastTarget = false;
         text.color = Color.black;
-        controller = c;
     }
     public void UpdateDisplay(Sprite sprite , string slotId){
         image.sprite = sprite;
         text.text = slotId;
     }
-    void OnSlotClicked(){
-        controller.SlotClicked();
+    private void OnSlotClicked(){
+        view.SlotClicked(index);
     }
 }
