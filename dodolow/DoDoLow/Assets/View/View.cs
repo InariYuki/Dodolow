@@ -6,10 +6,12 @@ using TMPro;
 
 public delegate void EventInt(int i);
 public delegate void VoidEvent();
+public delegate void EventBool(bool b);
 public class View : MonoBehaviour
 {
     public event EventInt SlotClickedEvent;
-    public event VoidEvent StartGameEvent , ExitGameEvent , RestartEvent , MainMenuEvent;
+    public event VoidEvent ExitGameEvent , MainMenuEvent;
+    public event EventBool StartGameEvent;
     [SerializeField] private List<SlotView> slotViews = new List<SlotView>();
     [SerializeField] private GameObject mainMenu;
     [SerializeField] private GameObject restartButton , mainMenuButton;
@@ -27,7 +29,7 @@ public class View : MonoBehaviour
     }
     public void OnStartGameButtonPressed(){
         mainMenu.SetActive(false);
-        StartGameEvent();
+        StartGameEvent(cheatBox.isOn);
     }
     public void OnExitButtonPressed(){
         ExitGameEvent();
@@ -36,10 +38,7 @@ public class View : MonoBehaviour
         MainMenuEvent();
     }
     public void OnRestartButtonPressed(){
-        RestartEvent();
-    }
-    public bool CheatBoxChecked(){
-        return cheatBox.isOn;
+        StartGameEvent(cheatBox.isOn);
     }
     public void ToggleMainMenu(bool state){
         mainMenu.SetActive(state);
@@ -50,23 +49,14 @@ public class View : MonoBehaviour
     public void ToggleRestartButton(bool state){
         restartButton.SetActive(state);
     }
-    public void SetSlotView(int index , int id , int state , bool cheat){
-        Sprite sprite;
-        string slotIdText;
-        if(state == 0){ // open
-            sprite = Assets.Instance.IdCardDict[id].image;
-            slotIdText = "";
-        }
-        else if(state == 1){ // close
-            sprite = Assets.Instance.blankSprite;
-            if(cheat) slotIdText = id.ToString();
-            else slotIdText = "";
-        }
-        else{ // disable
-            sprite = Assets.Instance.disableSprite;
-            slotIdText = "";
-        }
-        slotViews[index].UpdateDisplay(sprite , slotIdText);
+    public void SetSlotViewOpen(int index , int imageId){
+        slotViews[index].UpdateDisplay(Assets.Instance.IdCardDict[imageId].image , "");
+    }
+    public void SetSlotViewClose(int index , string slotId){
+        slotViews[index].UpdateDisplay(Assets.Instance.blankSprite , slotId);
+    }
+    public void SetSlotViewDisabled(int index){
+        slotViews[index].UpdateDisplay(Assets.Instance.disableSprite , "");
     }
     public void SetTimerTime(string time){
         timerDisplay.text = time;

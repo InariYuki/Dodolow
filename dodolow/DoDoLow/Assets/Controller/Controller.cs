@@ -15,41 +15,50 @@ public class Controller
         view.StartGameEvent += StartGameButtonPressed;
         view.SlotClickedEvent += SlotClicked;
         view.MainMenuEvent += MainMenuButtonPressed;
-        view.RestartEvent += StartGameButtonPressed;
-        model.RandomizeGameCompleteEvent += ShowAllCardsToPlayer;
-        model.SlotClickedEvent += SlotClickedCallBack;
-        model.MatchEvent += SlotMatch;
-        model.MisMatchEvent += SlotMismatch;
-        model.GameFinishedEvent += GameOver;
         timer.TickEvent += UpdateTime;
     }
-    private void StartGameButtonPressed(){
+    private void StartGameButtonPressed(bool cheat){
+        model.SetMouseLock(true);
+        model.SetCheat(cheat);
         view.ToggleMainMenu(false);
         view.ToggleManuMenuButton(false);
         view.ToggleRestartButton(false);
         view.SetTimerTime(0.ToString());
         model.RandomizeGame();
         timer.ResetTimer();
+        ShowAllCardsToPlayer();
     }
     private void ShowAllCardsToPlayer(){
         for(int i = 0; i < model.GetSlotSize(); i++){
-            view.SetSlotView(i , model.GetSlotId(i) , 0 , view.CheatBoxChecked());
+            view.SetSlotViewOpen(i , model.GetSlotId(i));
         }
         timer.StopForSeconds(5 , CloseAllCards);
     }
     private void CloseAllCards(){
+        model.SetMouseLock(false);
         view.ToggleManuMenuButton(true);
         for(int i = 0; i < model.GetSlotSize(); i++){
-            view.SetSlotView(i , model.GetSlotId(i) , 1 , view.CheatBoxChecked());
-            model.SetSlotClickable(i , true);
+            view.SetSlotViewClose(i , model.GetSlotIdString(i));
+            model.SetSlotClickable(i);
         }
         timer.StartTimer();
     }
     private void SlotClicked(int index){
-        model.SlotClicked(index);
-    }
-    private void SlotClickedCallBack(int index){
-        view.SetSlotView(index , model.GetSlotId(index) , 0 , view.CheatBoxChecked());
+        GameStat gameStat = model.SlotClicked(index);
+        if(gameStat == null) return;
+        view.SetSlotViewOpen(index , model.GetSlotId(index));
+        if(gameStat.state == GameState.Match){
+            SlotMatch(gameStat.clickedIndex1 , gameStat.clickedIndex2);
+        }
+        else if(gameStat.state == GameState.MisMatch){
+            SlotMismatch(gameStat.clickedIndex1 , gameStat.clickedIndex2);
+        }
+        else if(gameStat.state == GameState.OneClicked){
+        }
+        else{
+            SlotMatch(gameStat.clickedIndex1 , gameStat.clickedIndex2);
+            GameOver();
+        }
     }
     private void SlotMatch(int index1 , int index2){
         model.SetMouseLock(true);
@@ -60,15 +69,15 @@ public class Controller
         timer.StopForSeconds(1 , () => {CloseSlots(index1 , index2);});
     }
     private void DisableSlots(int index1 , int index2){
-        view.SetSlotView(index1 , model.GetSlotId(index1) , 2 , view.CheatBoxChecked());
-        view.SetSlotView(index2 , model.GetSlotId(index2) , 2 , view.CheatBoxChecked());
+        view.SetSlotViewDisabled(index1);
+        view.SetSlotViewDisabled(index2);
         model.SetMouseLock(false);
     }
     private void CloseSlots(int index1 , int index2){
-        view.SetSlotView(index1 , model.GetSlotId(index1) , 1 , view.CheatBoxChecked());
-        view.SetSlotView(index2 , model.GetSlotId(index2) , 1 , view.CheatBoxChecked());
-        model.SetSlotClickable(index1 , true);
-        model.SetSlotClickable(index2 , true);
+        view.SetSlotViewClose(index1 , model.GetSlotIdString(index1));
+        view.SetSlotViewClose(index2 , model.GetSlotIdString(index2));
+        model.SetSlotClickable(index1);
+        model.SetSlotClickable(index2);
         model.SetMouseLock(false);
     }
     private void GameOver(){

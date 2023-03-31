@@ -2,28 +2,40 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public delegate void VoidEventIntInt(int index1 , int index2);
 public class Model
 {
-    public event VoidEvent RandomizeGameCompleteEvent , GameFinishedEvent;
-    public event EventInt SlotClickedEvent;
-    public event VoidEventIntInt MatchEvent , MisMatchEvent;
     private List<SlotModel> slotModels = new List<SlotModel>();
     private List<int> slotIds = new List<int>();
     private SlotModel currentSlot;
     private bool mouseLock = false;
-    private int openedSlotCount = 0;
+    private int openedSlotCount = 0 , SlotHalfCount = 20;
+    private bool cheat = false;
     public void Initialize(){
-        for(int i = 0; i < 40; i++){
-            SlotModel s = new SlotModel();
+        SlotModel s;
+        int SlotCount = SlotHalfCount + SlotHalfCount;
+        for(int i = 0; i < SlotCount; i++){
+            s = new SlotModel();
             s.index = i;
             s.slotId = 0;
             slotModels.Add(s);
-            if(i % 2 == 0){
-                int index = i / 2;
-                slotIds.Add(index);
-                slotIds.Add(index);
-            }
+        }
+        for(int i = 0; i < SlotHalfCount; i++){
+            slotIds.Add(i);
+            slotIds.Add(i);
+        }
+    }
+    public void SetCheat(bool state){
+        cheat = state;
+    }
+    public bool GetCheat(){
+        return cheat;
+    }
+    public string GetSlotIdString(int index){
+        if(cheat){
+            return slotModels[index].slotId.ToString();
+        }
+        else{
+            return "";
         }
     }
     public void RandomizeGame(){
@@ -32,30 +44,37 @@ public class Model
         for(int i = 0; i < slotModels.Count; i++){
             slotModels[i].slotId = slotIds[i];
         }
-        RandomizeGameCompleteEvent();
     }
-    public void SetSlotClickable(int index , bool state){
-        slotModels[index].canBeClick = state;
+    public void SetSlotClickable(int index){
+        slotModels[index].canBeClick = true;
     }
-    public void SlotClicked(int index){
-        if(!slotModels[index].canBeClick || mouseLock) return;
+    public GameStat SlotClicked(int index){
+        if(!slotModels[index].canBeClick || mouseLock) return null;
         slotModels[index].canBeClick = false;
-        SlotClickedEvent(index);
+        GameStat stat = new GameStat();
         if(currentSlot == null){
             currentSlot = slotModels[index];
+            stat.state = GameState.OneClicked;
+            return stat;
         }
         else{
+            mouseLock = true;
+            stat.clickedIndex1 = index;
+            stat.clickedIndex2 = currentSlot.index;
             if(slotModels[index].slotId == currentSlot.slotId){
-                MatchEvent(index , currentSlot.index);
                 openedSlotCount += 2;
                 if(openedSlotCount == slotModels.Count){
-                    GameFinishedEvent();
+                    stat.state = GameState.End;
+                }
+                else{
+                    stat.state = GameState.Match;
                 }
             }
             else{
-                MisMatchEvent(index , currentSlot.index);
+                stat.state = GameState.MisMatch;
             }
             currentSlot = null;
+            return stat;
         }
     }
     public int GetSlotId(int index){
@@ -83,4 +102,14 @@ class SlotModel{
     public int index;
     public int slotId;
     public bool canBeClick = false;
+}
+public class GameStat{
+    public GameState state;
+    public int clickedIndex1 , clickedIndex2;
+}
+public enum GameState{
+    OneClicked,
+    Match,
+    MisMatch,
+    End
 }
