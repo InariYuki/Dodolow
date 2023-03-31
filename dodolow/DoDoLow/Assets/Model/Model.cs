@@ -27,9 +27,6 @@ public class Model
     public void SetCheat(bool state){
         cheat = state;
     }
-    public bool GetCheat(){
-        return cheat;
-    }
     public string GetSlotIdString(int index){
         if(cheat){
             return slotModels[index].slotId.ToString();

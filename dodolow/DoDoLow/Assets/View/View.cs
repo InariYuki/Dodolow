@@ -21,7 +21,8 @@ public class View : MonoBehaviour
         Controller controller = new Controller();
         controller.Initialize(this);
         for(int i = 0; i < slotViews.Count; i++){
-            slotViews[i].Initialize(this , i);
+            slotViews[i].Initialize(i);
+            slotViews[i].SlotClickedEvent += SlotClicked;
         }
     }
     public void SlotClicked(int index){

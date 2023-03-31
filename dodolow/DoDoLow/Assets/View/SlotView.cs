@@ -6,12 +6,11 @@ using TMPro;
 
 public class SlotView : MonoBehaviour
 {
+    public EventInt SlotClickedEvent;
     private Image image;
     private TextMeshProUGUI text;
-    private View view;
     private int index;
-    public void Initialize(View v , int i){
-        view = v;
+    public void Initialize(int i){
         index = i;
         image = GetComponent<Image>();
         GetComponent<Button>().onClick.AddListener(OnSlotClicked);
@@ -24,6 +23,6 @@ public class SlotView : MonoBehaviour
         text.text = slotId;
     }
     private void OnSlotClicked(){
-        view.SlotClicked(index);
+        SlotClickedEvent(index);
     }
 }

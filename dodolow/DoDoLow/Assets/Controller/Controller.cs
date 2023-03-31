@@ -53,9 +53,7 @@ public class Controller
         else if(gameStat.state == GameState.MisMatch){
             SlotMismatch(gameStat.clickedIndex1 , gameStat.clickedIndex2);
         }
-        else if(gameStat.state == GameState.OneClicked){
-        }
-        else{
+        else if(gameStat.state == GameState.End){
             SlotMatch(gameStat.clickedIndex1 , gameStat.clickedIndex2);
             GameOver();
         }
