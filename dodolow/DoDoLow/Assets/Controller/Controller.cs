@@ -32,7 +32,7 @@ public class Controller
         for(int i = 0; i < model.GetSlotSize(); i++){
             view.SetSlotViewOpen(i , model.GetSlotId(i));
         }
-        timer.StopForSeconds(5 , CloseAllCards);
+        timer.StopForSeconds(model.GetAllOpenTime() , CloseAllCards);
     }
     private void CloseAllCards(){
         model.SetMouseLock(false);
@@ -60,11 +60,11 @@ public class Controller
     }
     private void SlotMatch(int index1 , int index2){
         model.SetMouseLock(true);
-        timer.StopForSeconds(1 , () => {DisableSlots(index1 , index2);});
+        timer.StopForSeconds(model.GetResetSlotTime() , () => {DisableSlots(index1 , index2);});
     }
     private void SlotMismatch(int index1 , int index2){
         model.SetMouseLock(true);
-        timer.StopForSeconds(1 , () => {CloseSlots(index1 , index2);});
+        timer.StopForSeconds(model.GetResetSlotTime() , () => {CloseSlots(index1 , index2);});
     }
     private void DisableSlots(int index1 , int index2){
         view.SetSlotViewDisabled(index1);
@@ -80,7 +80,7 @@ public class Controller
     }
     private void GameOver(){
         timer.StopTimer();
-        timer.StopForSeconds(1 , () => {view.ToggleRestartButton(true);});
+        timer.StopForSeconds(model.GetResetSlotTime() , () => {view.ToggleRestartButton(true);});
     }
     private void MainMenuButtonPressed(){
         timer.StopTimer();

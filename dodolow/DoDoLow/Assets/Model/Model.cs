@@ -10,6 +10,7 @@ public class Model
     private bool mouseLock = false;
     private int openedSlotCount = 0 , SlotHalfCount = 20;
     private bool cheat = false;
+    private int resetSlotTime = 1 , allOpenSlotTime = 5;
     public void Initialize(){
         SlotModel s;
         int SlotCount = SlotHalfCount + SlotHalfCount;
@@ -82,6 +83,12 @@ public class Model
     }
     public void SetMouseLock(bool state){
         mouseLock = state;
+    }
+    public int GetAllOpenTime(){
+        return allOpenSlotTime;
+    }
+    public int GetResetSlotTime(){
+        return resetSlotTime;
     }
     private List<T> Shuffle<T>(List<T> list){
         int n = list.Count;  
